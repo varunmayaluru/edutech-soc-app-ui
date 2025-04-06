@@ -78,10 +78,11 @@ export default function PhysicsLab() {
     setSubmitted(true);
 
     // API call
-    const openaiKey = process.env.OPENAI_API_KEY;
+    const openaiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+    console.log("OpenAI API Key:", openaiKey);
 
     const payload = {
-      openai_api_key: "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",
+      openai_api_key: openaiKey,
       model: "gpt-4o",
       complex_question: questionData.question.complex_question,
       actual_answer: "string", // Replace with actual answer if available
