@@ -12,6 +12,7 @@ import {
   Award,
   Settings,
   HelpCircle,
+  ChevronLeft,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
@@ -33,7 +34,7 @@ export default function PhysicsLab() {
   const [feedbackType, setFeedbackType] = useState<"success" | "error">("success")
   const [questionData, setQuestionData] = useState<any>(null);
   const [userAnswer, setUserAnswer] = useState<string | null>("");
-  const [quizFilename, setQuizFilename] = useState<string>("math.xlsx");
+  const [quizFilename, setQuizFilename] = useState<string>("physics.xlsx");
 
   // The correct answer is "b. Stone" since it has more mass and thus more inertia
   const correctAnswer = "b"
@@ -80,7 +81,7 @@ export default function PhysicsLab() {
     const openaiKey = process.env.OPENAI_API_KEY;
 
     const payload = {
-      openai_api_key: "sk - proj - QSsWxQs1fxKC7nRWT_8y6pLSnZvzH - l05mjtgTPd1CxPtZtBLzEm6HNrbB1brObdoYGgxV1TsTT3BlbkFJCynVlYDlLASSrEeEqMVUj4QunJjSXdGzpeUsosOQy_b1Pf7wSA6nKspEb002wXBsL1w_POaGwA",
+      openai_api_key: "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",
       model: "gpt-4o",
       complex_question: questionData.question.complex_question,
       actual_answer: "string", // Replace with actual answer if available
@@ -157,6 +158,14 @@ export default function PhysicsLab() {
     setQuestionData(question); // ✅ this will trigger a UI update
   };
 
+  const previousQuestion = async () => {
+    resetQuestion();
+    let currentIndex = questionData?.current_index - 1;
+    const question = await getQuestion(quizFilename, currentIndex, "stay");
+    console.log("Fetched question:", question); // ✅ this is the latest data
+    setQuestionData(question); // ✅ this will trigger a UI update
+  };
+
 
   return (
     <div className="flex min-h-screen bg-[#050714] text-white overflow-hidden">
@@ -225,13 +234,22 @@ export default function PhysicsLab() {
                   Physics Experiment
                 </h2>
                 <div className="relative">
-                  <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-md blur opacity-75"></div>
+                  <div className="absolute -inset-0.7 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-md blur opacity-75"></div>
                   <Button
                     variant="outline"
+                    disabled={questionData?.is_first === true}
+                    className="relative bg-[#0c0e1d] hover:bg-[#161a36] text-white border-purple-700/50"
+                    onClick={previousQuestion}
+                  >
+                    <ChevronLeft size={16} className="mr-1" /> prev
+                  </Button>
+                  <Button
+                    variant="outline"
+                    disabled={questionData?.is_last === true}
                     className="relative bg-[#0c0e1d] hover:bg-[#161a36] text-white border-purple-700/50"
                     onClick={nextQuestion}
                   >
-                    Next Question <ChevronRight size={16} className="ml-1" />
+                    Next<ChevronRight size={16} className="ml-1" />
                   </Button>
                 </div>
               </div>
