@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import {
   Send,
   ChevronRight,
@@ -15,10 +15,15 @@ import {
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
+import TextToSpeech from "@/components/ui/TextToSpeech";
+import { SpeechProvider } from "@/components/ui/SpeechProvider";
+// import 'katex/dist/katex.min.css';
+
 
 export default function PhysicsLab() {
   const [userMessage, setUserMessage] = useState("")
-  const [selectedOption, setSelectedOption] = useState<string | null>(null)
+  const [selectedOptionId, setselectedOptionId] = useState<string | null>(null)
+  const [selectedOption, setselectedOption] = useState<string | null>(null)
   const [menuOpen, setMenuOpen] = useState(false)
   const [chatActive, setChatActive] = useState(false)
   const [messages, setMessages] = useState<{ type: "ai" | "user"; content: string }[]>([])
@@ -26,32 +31,86 @@ export default function PhysicsLab() {
   const [showFeedback, setShowFeedback] = useState(false)
   const [feedbackMessage, setFeedbackMessage] = useState("")
   const [feedbackType, setFeedbackType] = useState<"success" | "error">("success")
+  const [questionData, setQuestionData] = useState<any>(null);
+  const [userAnswer, setUserAnswer] = useState<string | null>("");
+  const [quizFilename, setQuizFilename] = useState<string>("math.xlsx");
 
   // The correct answer is "b. Stone" since it has more mass and thus more inertia
   const correctAnswer = "b"
 
-  const handleSubmit = () => {
-    if (!selectedOption) {
-      setFeedbackMessage("Please select an option first")
-      setFeedbackType("error")
-      setShowFeedback(true)
-      setTimeout(() => setShowFeedback(false), 3000)
-      return
+  useEffect(() => {
+    const fetchQuestion = async () => {
+      const questionData = await getQuestion(quizFilename, 0, "stay");
+      console.log("Fetched question:", questionData);
+      setQuestionData(questionData);
+    };
+
+    fetchQuestion();
+  }, []);
+
+  const getQuestion = async (filename: string, currentIndex: number, direction: string = "stay") => {
+    try {
+      const res = await fetch(
+        `http://44.202.53.50:8000/vhm/get_question?filename=${filename}&current_index=${currentIndex}&direction=${direction}`
+      );
+
+      if (!res.ok) throw new Error("Failed to fetch question");
+
+      const data = await res.json();
+      return data;
+    } catch (error) {
+      console.error("Error fetching question:", error);
+      return null;
+    }
+  };
+
+
+  const handleSubmit = async () => {
+    // if (!selectedOptionId || userAnswer) {
+    //   setFeedbackMessage("Please select an option first");
+    //   setFeedbackType("error");
+    //   setShowFeedback(true);
+    //   setTimeout(() => setShowFeedback(false), 3000);
+    //   return;
+    // }
+
+    setSubmitted(true);
+
+    // API call
+    const openaiKey = process.env.OPENAI_API_KEY;
+
+    const payload = {
+      openai_api_key: "sk - proj - QSsWxQs1fxKC7nRWT_8y6pLSnZvzH - l05mjtgTPd1CxPtZtBLzEm6HNrbB1brObdoYGgxV1TsTT3BlbkFJCynVlYDlLASSrEeEqMVUj4QunJjSXdGzpeUsosOQy_b1Pf7wSA6nKspEb002wXBsL1w_POaGwA",
+      model: "gpt-4o",
+      complex_question: questionData.question.complex_question,
+      actual_answer: "string", // Replace with actual answer if available
+      correct_answer: questionData.question.correct_quiz_answer,
+      student_answer: selectedOption,
+    };
+
+    try {
+      const res = await fetch("http://44.202.53.50:8000/vhm/get_first_soc_question", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await res.json();
+      console.log("API Response:", data);
+    } catch (error) {
+      console.error("API call failed:", error);
     }
 
-    setSubmitted(true)
-
-    if (selectedOption === correctAnswer) {
-      // Correct answer
-      setFeedbackMessage("Correct! The stone has more inertia.")
-      setFeedbackType("success")
-      setShowFeedback(true)
-      setTimeout(() => setShowFeedback(false), 3000)
+    // Feedback logic
+    if (selectedOptionId === correctAnswer) {
+      setFeedbackMessage("Correct! The stone has more inertia.");
+      setFeedbackType("success");
+      setShowFeedback(true);
+      setTimeout(() => setShowFeedback(false), 3000);
     } else {
-      // Wrong answer - activate chat
-      setChatActive(true)
-
-      // Add initial AI message after a short delay to simulate typing
+      setChatActive(true);
       setTimeout(() => {
         setMessages([
           {
@@ -59,10 +118,11 @@ export default function PhysicsLab() {
             content:
               "I noticed you selected an incorrect answer. Let's discuss inertia a bit more. Can you tell me what factors affect an object's inertia?",
           },
-        ])
-      }, 800)
+        ]);
+      }, 800);
     }
-  }
+  };
+
 
   const sendMessage = () => {
     if (!userMessage.trim()) return
@@ -83,11 +143,20 @@ export default function PhysicsLab() {
   }
 
   const resetQuestion = () => {
-    setSelectedOption(null)
+    setselectedOptionId(null)
     setSubmitted(false)
     setChatActive(false)
     setMessages([])
   }
+
+  const nextQuestion = async () => {
+    resetQuestion();
+    let currentIndex = questionData?.current_index + 1;
+    const question = await getQuestion(quizFilename, currentIndex, "stay");
+    console.log("Fetched question:", question); // ✅ this is the latest data
+    setQuestionData(question); // ✅ this will trigger a UI update
+  };
+
 
   return (
     <div className="flex min-h-screen bg-[#050714] text-white overflow-hidden">
@@ -160,7 +229,7 @@ export default function PhysicsLab() {
                   <Button
                     variant="outline"
                     className="relative bg-[#0c0e1d] hover:bg-[#161a36] text-white border-purple-700/50"
-                    onClick={resetQuestion}
+                    onClick={nextQuestion}
                   >
                     Next Question <ChevronRight size={16} className="ml-1" />
                   </Button>
@@ -184,7 +253,7 @@ export default function PhysicsLab() {
               <div className="mb-6">
                 <div className="flex items-center mb-2">
                   <div className="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
-                  <p className="text-gray-300 text-sm">Question 1</p>
+                  <p className="text-gray-300 text-sm">Question {questionData?.current_index + 1} / {questionData?.total_questions + 1}</p>
                 </div>
                 {/* <div className="bg-[#0c0e1d] p-5 rounded-lg border border-[#1a1e36] shadow-[0_0_15px_rgba(123,58,237,0.1)]">
                   <p className="text-white">
@@ -199,43 +268,66 @@ export default function PhysicsLab() {
                   <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-purple-500/10 blur-3xl"></div>
 
                   <p className="text-center text-[#c9d1d9] relative z-10 text-xl">
-                    Which of the following has more inertia: (a) a rubber ball or a stone of the same size?
+                    {questionData?.question.complex_question}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-3">
-                {[
-                  { id: "a", label: "Rubber ball" },
-                  { id: "b", label: "Stone" },
-                  { id: "c", label: "Both same" },
-                  { id: "d", label: "Cannot determine" },
-                ].map((option) => (
-                  <div
-                    key={option.id}
-                    className={cn(
-                      "relative bg-[#0c0e1d] p-4 rounded-lg cursor-pointer transition-all hover:bg-[#161a36] border",
-                      selectedOption === option.id
-                        ? "bg-gradient-to-r from-purple-900/50 to-cyan-900/50 border-purple-500/50"
-                        : "bg-[#1a1d24]/80 border-[#2a2d35] hover:bg-[#2a2d35]/80",
-                      // submitted &&
-                      // option.id === correctAnswer &&
-                      // "border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]",
-                      // submitted &&
-                      // selectedOption === option.id &&
-                      // option.id !== correctAnswer &&
-                      // "border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]",
-                    )}
-                    onClick={() => !submitted && setSelectedOption(option.id)}
-                  >
-                    <div className="flex items-center">
 
-                      <p className="text-white">
-                        {option.id}. {option.label}
-                      </p>
+                {
+                  questionData?.question.is_maths != 1 &&
+                  (questionData?.question.options.map((option: any, index: any) => (
+                    <div
+                      key={index}
+                      className={cn(
+                        "relative bg-[#0c0e1d] p-4 rounded-lg cursor-pointer transition-all hover:bg-[#161a36] border",
+                        selectedOptionId === index + 1
+                          ? "bg-gradient-to-r from-purple-900/50 to-cyan-900/50 border-purple-500/50"
+                          : "bg-[#1a1d24]/80 border-[#2a2d35] hover:bg-[#2a2d35]/80",
+                        // submitted &&
+                        // option.id === correctAnswer &&
+                        // "border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]",
+                        // submitted &&
+                        // selectedOptionId === option.id &&
+                        // option.id !== correctAnswer &&
+                        // "border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]",
+                      )}
+                      onClick={() => {
+                        if (!submitted) {
+                          setselectedOptionId(index + 1);
+                          setselectedOption(option);
+                        }
+                      }}
+                    >
+                      <div className="flex items-center">
+
+                        <p className="text-white">
+                          {index + 1}. {option}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  )))}
+
+
+                <div>
+                  {
+                    questionData?.question.is_maths == 1 &&
+                    <div className="relative bg-[#0c0e1d] p-4 rounded-lg cursor-pointer transition-all hover:bg-[#161a36] border">
+                      <div className="flex items-center">
+                        <p className="text-white">
+                          Enter your answer:
+                        </p>
+                        <input
+                          type="text"
+                          // value={userAnswer}
+                          onChange={(e) => setUserAnswer(e.target.value)}
+                          className="ml-2 bg-[#1a1d24]/80 border border-[#2a2d35] rounded-lg p-2 text-white"
+                        />
+                      </div>
+                    </div>
+                  }
+                </div>
               </div>
 
               <div className="mt-6">
@@ -287,6 +379,15 @@ export default function PhysicsLab() {
                         {message.type === "ai" ? "💬" : "👤"}
                       </div>
                       <p className="text-white">{message.content}</p>
+                      <SpeechProvider>
+                        {message.type === "ai" && (
+                          <TextToSpeech
+                            key={index}
+                            id={index.toString()}
+                            message={message.content}
+                          />
+                        )}
+                      </SpeechProvider>
                     </div>
                   </div>
                 ))}
