@@ -1,64 +1,27 @@
 "use client";
-
 import { createContext, useContext, useState, useRef } from "react";
-
-type Message = { id: string; text: string };
 
 const SpeechContext = createContext<any>(null);
 
 export const SpeechProvider = ({ children }: { children: React.ReactNode }) => {
   const [currentId, setCurrentId] = useState<string | null>(null);
   const [isPaused, setIsPaused] = useState(false);
-
-  const queueRef = useRef<Message[]>([]);
-  const indexRef = useRef<number>(0);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  const cancelCurrent = () => {
+  const speak = (id: string, text: string) => {
+    // Stop any previous speech
     speechSynthesis.cancel();
-    setCurrentId(null);
-    setIsPaused(false);
-  };
 
-  const speakSingle = (id: string, text: string) => {
-    cancelCurrent();
     const utterance = new SpeechSynthesisUtterance(text);
-
     utterance.onend = () => {
       setCurrentId(null);
       setIsPaused(false);
+      utteranceRef.current = null;
     };
 
     speechSynthesis.speak(utterance);
     utteranceRef.current = utterance;
     setCurrentId(id);
-    setIsPaused(false);
-  };
-
-  const speakQueue = (messages: Message[]) => {
-    cancelCurrent();
-    queueRef.current = messages;
-    indexRef.current = 0;
-    playNextFromQueue();
-  };
-
-  const playNextFromQueue = () => {
-    if (indexRef.current >= queueRef.current.length) {
-      setCurrentId(null);
-      return;
-    }
-
-    const message = queueRef.current[indexRef.current];
-    const utterance = new SpeechSynthesisUtterance(message.text);
-
-    utterance.onend = () => {
-      indexRef.current += 1;
-      playNextFromQueue();
-    };
-
-    speechSynthesis.speak(utterance);
-    utteranceRef.current = utterance;
-    setCurrentId(message.id);
     setIsPaused(false);
   };
 
@@ -77,9 +40,10 @@ export const SpeechProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   const reset = () => {
-    cancelCurrent();
-    queueRef.current = [];
-    indexRef.current = 0;
+    speechSynthesis.cancel();
+    setCurrentId(null);
+    setIsPaused(false);
+    utteranceRef.current = null;
   };
 
   return (
@@ -87,8 +51,7 @@ export const SpeechProvider = ({ children }: { children: React.ReactNode }) => {
       value={{
         currentId,
         isPaused,
-        speak: speakSingle,
-        speakQueue,
+        speak,
         pause,
         resume,
         reset,

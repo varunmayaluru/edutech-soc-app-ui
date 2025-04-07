@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import {
   Send,
   ChevronRight,
@@ -13,31 +13,34 @@ import {
   Settings,
   HelpCircle,
   ChevronLeft,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { cn } from "@/lib/utils"
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import TextToSpeech from "@/components/ui/TextToSpeech";
 import { SpeechProvider } from "@/components/ui/SpeechProvider";
 // import 'katex/dist/katex.min.css';
 
-
 export default function PhysicsLab() {
-  const [userMessage, setUserMessage] = useState("")
-  const [selectedOptionId, setselectedOptionId] = useState<string | null>(null)
-  const [selectedOption, setselectedOption] = useState<string | null>(null)
-  const [menuOpen, setMenuOpen] = useState(false)
-  const [chatActive, setChatActive] = useState(false)
-  const [messages, setMessages] = useState<{ type: "ai" | "user"; content: string }[]>([])
-  const [submitted, setSubmitted] = useState(false)
-  const [showFeedback, setShowFeedback] = useState(false)
-  const [feedbackMessage, setFeedbackMessage] = useState("")
-  const [feedbackType, setFeedbackType] = useState<"success" | "error">("success")
+  const [userMessage, setUserMessage] = useState("");
+  const [selectedOptionId, setselectedOptionId] = useState<string | null>(null);
+  const [selectedOption, setselectedOption] = useState<string | null>(null);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const [chatActive, setChatActive] = useState(false);
+  const [messages, setMessages] = useState<
+    { type: "ai" | "user"; content: string }[]
+  >([]);
+  const [submitted, setSubmitted] = useState(false);
+  const [showFeedback, setShowFeedback] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState("");
+  const [feedbackType, setFeedbackType] = useState<"success" | "error">(
+    "success"
+  );
   const [questionData, setQuestionData] = useState<any>(null);
   const [userAnswer, setUserAnswer] = useState<string | null>("");
   const [quizFilename, setQuizFilename] = useState<string>("physics.xlsx");
 
   // The correct answer is "b. Stone" since it has more mass and thus more inertia
-  const correctAnswer = "b"
+  const correctAnswer = "b";
 
   useEffect(() => {
     const fetchQuestion = async () => {
@@ -49,7 +52,11 @@ export default function PhysicsLab() {
     fetchQuestion();
   }, []);
 
-  const getQuestion = async (filename: string, currentIndex: number, direction: string = "stay") => {
+  const getQuestion = async (
+    filename: string,
+    currentIndex: number,
+    direction: string = "stay"
+  ) => {
     try {
       const res = await fetch(
         `http://44.202.53.50:8000/vhm/get_question?filename=${filename}&current_index=${currentIndex}&direction=${direction}`
@@ -65,7 +72,6 @@ export default function PhysicsLab() {
     }
   };
 
-
   const handleSubmit = async () => {
     // if (!selectedOptionId || userAnswer) {
     //   setFeedbackMessage("Please select an option first");
@@ -79,7 +85,6 @@ export default function PhysicsLab() {
 
     // API call
     const openaiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
-    console.log("OpenAI API Key:", openaiKey);
 
     const payload = {
       openai_api_key: openaiKey,
@@ -91,13 +96,16 @@ export default function PhysicsLab() {
     };
 
     try {
-      const res = await fetch("http://44.202.53.50:8000/vhm/get_first_soc_question", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        "http://44.202.53.50:8000/vhm/get_first_soc_question",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(payload),
+        }
+      );
 
       const data = await res.json();
       console.log("API Response:", data);
@@ -125,31 +133,30 @@ export default function PhysicsLab() {
     }
   };
 
-
   const sendMessage = () => {
-    if (!userMessage.trim()) return
+    if (!userMessage.trim()) return;
 
-    // Add user message
-    setMessages((prev) => [...prev, { type: "user", content: userMessage }])
+    // Add user message 
+    setMessages((prev) => [...prev, { type: "user", content: userMessage }]);
 
     // Clear input
-    setUserMessage("")
+    setUserMessage("");
 
     // Simulate AI response after a delay
     setTimeout(() => {
       const aiResponse =
-        "That's a good point. Inertia is directly proportional to mass. Objects with greater mass have more inertia, meaning they resist changes in motion more. Since a stone has greater mass than a rubber ball of the same size, it has more inertia."
+        "That's a good point. Inertia is directly proportional to mass. Objects with greater mass have more inertia, meaning they resist changes in motion more. Since a stone has greater mass than a rubber ball of the same size, it has more inertia.";
 
-      setMessages((prev) => [...prev, { type: "ai", content: aiResponse }])
-    }, 1000)
-  }
+      setMessages((prev) => [...prev, { type: "ai", content: aiResponse }]);
+    }, 1000);
+  };
 
   const resetQuestion = () => {
-    setselectedOptionId(null)
-    setSubmitted(false)
-    setChatActive(false)
-    setMessages([])
-  }
+    setselectedOptionId(null);
+    setSubmitted(false);
+    setChatActive(false);
+    setMessages([]);
+  };
 
   const nextQuestion = async () => {
     resetQuestion();
@@ -167,14 +174,13 @@ export default function PhysicsLab() {
     setQuestionData(question); // ✅ this will trigger a UI update
   };
 
-
   return (
     <div className="flex min-h-screen bg-[#050714] text-white overflow-hidden">
       {/* Left Menu - Collapsible */}
       <div
         className={cn(
           "fixed md:relative z-40 h-full transition-all duration-300 ease-in-out bg-gradient-to-b from-[#0c0e1d] to-[#0a0c17] border-r border-[#1a1e36]",
-          menuOpen ? "w-64" : "w-16",
+          menuOpen ? "w-64" : "w-16"
         )}
       >
         <div className="flex items-center justify-between p-4 border-b border-[#1a1e36]">
@@ -187,7 +193,11 @@ export default function PhysicsLab() {
             onClick={() => setMenuOpen(!menuOpen)}
             className="p-1 rounded-full hover:bg-[#1a1e36] transition-colors"
           >
-            {menuOpen ? <X size={20} className="text-purple-400" /> : <Menu size={20} className="text-purple-400" />}
+            {menuOpen ? (
+              <X size={20} className="text-purple-400" />
+            ) : (
+              <Menu size={20} className="text-purple-400" />
+            )}
           </button>
         </div>
 
@@ -208,12 +218,24 @@ export default function PhysicsLab() {
                     "flex items-center p-3 rounded-lg transition-all",
                     item.active
                       ? "bg-gradient-to-r from-purple-900/50 to-indigo-900/50 border border-purple-700/50"
-                      : "hover:bg-[#1a1e36]",
+                      : "hover:bg-[#1a1e36]"
                   )}
                 >
-                  <span className={cn("text-purple-400", item.active && "text-purple-300")}>{item.icon}</span>
+                  <span
+                    className={cn(
+                      "text-purple-400",
+                      item.active && "text-purple-300"
+                    )}
+                  >
+                    {item.icon}
+                  </span>
                   {menuOpen && (
-                    <span className={cn("ml-3 transition-opacity", item.active ? "text-purple-300" : "text-gray-300")}>
+                    <span
+                      className={cn(
+                        "ml-3 transition-opacity",
+                        item.active ? "text-purple-300" : "text-gray-300"
+                      )}
+                    >
                       {item.label}
                     </span>
                   )}
@@ -225,10 +247,20 @@ export default function PhysicsLab() {
       </div>
 
       {/* Main Content */}
-      <div className={cn("flex-1 transition-all duration-300 ease-in-out", menuOpen ? "md:ml-64" : "md:ml-16")}>
+      <div
+        className={cn(
+          "flex-1 transition-all duration-300 ease-in-out",
+          menuOpen ? "md:ml-64" : "md:ml-16"
+        )}
+      >
         <div className="flex flex-col md:flex-row h-full">
           {/* Question Section */}
-          <div className={cn("w-full transition-all duration-500 ease-in-out max-w-6xl", chatActive ? "md:w-1/2" : "md:w-full")}>
+          <div
+            className={cn(
+              "w-full transition-all duration-500 ease-in-out max-w-6xl",
+              chatActive ? "md:w-1/2" : "md:w-full"
+            )}
+          >
             <div className="p-6">
               <div className="flex items-center justify-between mb-8">
                 <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-400">
@@ -250,7 +282,8 @@ export default function PhysicsLab() {
                     className="relative bg-[#0c0e1d] hover:bg-[#161a36] text-white border-purple-700/50"
                     onClick={nextQuestion}
                   >
-                    Next<ChevronRight size={16} className="ml-1" />
+                    Next
+                    <ChevronRight size={16} className="ml-1" />
                   </Button>
                 </div>
               </div>
@@ -262,7 +295,7 @@ export default function PhysicsLab() {
                     "mb-4 p-3 rounded-lg border animate-fade-in",
                     feedbackType === "success"
                       ? "bg-green-900/20 border-green-700 text-green-400"
-                      : "bg-red-900/20 border-red-700 text-red-400",
+                      : "bg-red-900/20 border-red-700 text-red-400"
                   )}
                 >
                   {feedbackMessage}
@@ -272,16 +305,17 @@ export default function PhysicsLab() {
               <div className="mb-6">
                 <div className="flex items-center mb-2">
                   <div className="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
-                  <p className="text-gray-300 text-sm">Question {questionData?.current_index + 1} / {questionData?.total_questions + 1}</p>
+                  <p className="text-gray-300 text-sm">
+                    Question {questionData?.current_index + 1} /{" "}
+                    {questionData?.total_questions + 1}
+                  </p>
                 </div>
                 {/* <div className="bg-[#0c0e1d] p-5 rounded-lg border border-[#1a1e36] shadow-[0_0_15px_rgba(123,58,237,0.1)]">
                   <p className="text-white">
                     Which of the following has more inertia: (a) a rubber ball or a stone of the same size?
                   </p>
                 </div> */}
-                <div
-                  className="border border-[#2a2d35] rounded-lg p-6 mb-6 bg-[#12141d]/50 backdrop-blur-sm relative overflow-hidden"
-                >
+                <div className="border border-[#2a2d35] rounded-lg p-6 mb-6 bg-[#12141d]/50 backdrop-blur-sm relative overflow-hidden">
                   {/* Decorative elements */}
                   <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-purple-500 to-cyan-500 opacity-70"></div>
                   <div className="absolute -top-20 -right-20 w-40 h-40 rounded-full bg-purple-500/10 blur-3xl"></div>
@@ -293,50 +327,45 @@ export default function PhysicsLab() {
               </div>
 
               <div className="space-y-3">
-
-                {
-                  questionData?.question.is_maths != 1 &&
-                  (questionData?.question.options.map((option: any, index: any) => (
-                    <div
-                      key={index}
-                      className={cn(
-                        "relative bg-[#0c0e1d] p-4 rounded-lg cursor-pointer transition-all hover:bg-[#161a36] border",
-                        selectedOptionId === index + 1
-                          ? "bg-gradient-to-r from-purple-900/50 to-cyan-900/50 border-purple-500/50"
-                          : "bg-[#1a1d24]/80 border-[#2a2d35] hover:bg-[#2a2d35]/80",
-                        // submitted &&
-                        // option.id === correctAnswer &&
-                        // "border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]",
-                        // submitted &&
-                        // selectedOptionId === option.id &&
-                        // option.id !== correctAnswer &&
-                        // "border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]",
-                      )}
-                      onClick={() => {
-                        if (!submitted) {
-                          setselectedOptionId(index + 1);
-                          setselectedOption(option);
-                        }
-                      }}
-                    >
-                      <div className="flex items-center">
-
-                        <p className="text-white">
-                          {index + 1}. {option}
-                        </p>
+                {questionData?.question.is_maths != 1 &&
+                  questionData?.question.options.map(
+                    (option: any, index: any) => (
+                      <div
+                        key={index}
+                        className={cn(
+                          "relative bg-[#0c0e1d] p-4 rounded-lg cursor-pointer transition-all hover:bg-[#161a36] border",
+                          selectedOptionId === index + 1
+                            ? "bg-gradient-to-r from-purple-900/50 to-cyan-900/50 border-purple-500/50"
+                            : "bg-[#1a1d24]/80 border-[#2a2d35] hover:bg-[#2a2d35]/80"
+                          // submitted &&
+                          // option.id === correctAnswer &&
+                          // "border-green-500 shadow-[0_0_10px_rgba(34,197,94,0.3)]",
+                          // submitted &&
+                          // selectedOptionId === option.id &&
+                          // option.id !== correctAnswer &&
+                          // "border-red-500 shadow-[0_0_10px_rgba(239,68,68,0.3)]",
+                        )}
+                        onClick={() => {
+                          if (!submitted) {
+                            setselectedOptionId(index + 1);
+                            setselectedOption(option);
+                          }
+                        }}
+                      >
+                        <div className="flex items-center">
+                          <p className="text-white">
+                            {index + 1}. {option}
+                          </p>
+                        </div>
                       </div>
-                    </div>
-                  )))}
-
+                    )
+                  )}
 
                 <div>
-                  {
-                    questionData?.question.is_maths == 1 &&
+                  {questionData?.question.is_maths == 1 && (
                     <div className="relative bg-[#0c0e1d] p-4 rounded-lg cursor-pointer transition-all hover:bg-[#161a36] border">
                       <div className="flex items-center">
-                        <p className="text-white">
-                          Enter your answer:
-                        </p>
+                        <p className="text-white">Enter your answer:</p>
                         <input
                           type="text"
                           // value={userAnswer}
@@ -345,13 +374,12 @@ export default function PhysicsLab() {
                         />
                       </div>
                     </div>
-                  }
+                  )}
                 </div>
               </div>
 
               <div className="mt-6">
                 <div className="relative inline-block">
-
                   <Button
                     className="bg-gradient-to-r from-purple-600 to-cyan-600 hover:from-purple-700 hover:to-cyan-700 text-white border-none"
                     onClick={handleSubmit}
@@ -378,39 +406,42 @@ export default function PhysicsLab() {
               </div>
 
               <div className="space-y-4 mb-4 h-[calc(100vh-200px)] overflow-y-auto pr-2 custom-scrollbar">
-                {messages.map((message, index) => (
-                  <div
-                    key={index}
-                    className={cn(
-                      "mb-4 p-3 rounded-lg max-w-[90%]",
-                      message.type === "ai"
-                        ? "bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/20 ml-0 mr-auto"
-                        : "bg-[#2a2d35] ml-auto mr-0",
-                    )}
-                  >
-                    <div className="flex items-start">
-                      <div
-                        className={cn(
-                          "mr-2 p-1 rounded-full",
-                          message.type === "ai" ? "text-purple-400 bg-purple-900/50" : "text-gray-400 bg-gray-800/50",
-                        )}
-                      >
-                        {message.type === "ai" ? "💬" : "👤"}
-                      </div>
-                      <p className="text-white">{message.content}</p>
-                      <SpeechProvider>
-                        {message.type === "ai" && (
-                          <TextToSpeech
-                            key={index}
-                            id={index.toString()}
-                            message={message.content}
-                          />
-                        )}
-                      </SpeechProvider>
-                    </div>
-                  </div>
-                ))}
+                <SpeechProvider>
+                  {messages.map((message, index) => (
+                    <div
+                      key={index}
+                      className={cn(
+                        "mb-4 p-3 rounded-lg max-w-[90%]",
+                        message.type === "ai"
+                          ? "bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/20 ml-0 mr-auto"
+                          : "bg-[#2a2d35] ml-auto mr-0"
+                      )}
+                    >
+                      <div className="flex items-start">
+                        <div
+                          className={cn(
+                            "mr-2 p-1 rounded-full",
+                            message.type === "ai"
+                              ? "text-purple-400 bg-purple-900/50"
+                              : "text-gray-400 bg-gray-800/50"
+                          )}
+                        >
+                          {message.type === "ai" ? "💬" : "👤"}
+                        </div>
+                        <p className="text-white">{message.content}</p>
 
+                        {message.type === "ai" && (
+                          <div key={index}>
+                            <TextToSpeech
+                              id={index.toString()}
+                              message={message.content}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </SpeechProvider>
                 {messages.length === 0 && (
                   <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
                     <div className="w-16 h-16 rounded-full bg-[#161a36] flex items-center justify-center mb-4">
@@ -418,7 +449,8 @@ export default function PhysicsLab() {
                     </div>
                     <p className="text-lg mb-2">AI Assistant Activated</p>
                     <p className="text-sm max-w-xs">
-                      The AI has detected you need help with this concept and is ready to assist you.
+                      The AI has detected you need help with this concept and is
+                      ready to assist you.
                     </p>
                   </div>
                 )}
@@ -449,6 +481,5 @@ export default function PhysicsLab() {
         </div>
       </div>
     </div>
-  )
+  );
 }
-
