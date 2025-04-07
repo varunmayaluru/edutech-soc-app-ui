@@ -13,11 +13,14 @@ import {
   Settings,
   HelpCircle,
   ChevronLeft,
+  BotMessageSquare,
+  CircleUserRound,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import TextToSpeech from "@/components/ui/TextToSpeech";
 import { SpeechProvider } from "@/components/ui/SpeechProvider";
+import { set } from "date-fns";
 // import 'katex/dist/katex.min.css';
 
 export default function PhysicsLab() {
@@ -27,7 +30,7 @@ export default function PhysicsLab() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [chatActive, setChatActive] = useState(false);
   const [messages, setMessages] = useState<
-    { type: "ai" | "user"; content: string }[]
+    { "role": "assistant" | "user"; content: string }[]
   >([]);
   const [submitted, setSubmitted] = useState(false);
   const [showFeedback, setShowFeedback] = useState(false);
@@ -39,8 +42,24 @@ export default function PhysicsLab() {
   const [userAnswer, setUserAnswer] = useState<string | null>("");
   const [quizFilename, setQuizFilename] = useState<string>("physics.xlsx");
 
+
   // The correct answer is "b. Stone" since it has more mass and thus more inertia
   const correctAnswer = "b";
+  const openaiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+  const ai_feedback_options = [
+    "Oops, that's not quite right. No worries—let's figure it out together!",
+    "Hmm, that's incorrect, but it's all part of learning. Let's dig in!",
+    "That's not the correct answer, but hey, we’re learning—let’s explore it more!",
+    "Not quite! But don’t stress—we’ll walk through it together.",
+    "Incorrect, but that’s okay! Let’s learn from it and move forward.",
+    "That’s a miss, but learning is a journey—let’s tackle it step by step!",
+    "You're off this time, but let’s uncover the right answer together!"
+  ]
+
+  const generateRandomFeedback = () => {
+    const randomIndex = Math.floor(Math.random() * ai_feedback_options.length);
+    return ai_feedback_options[randomIndex];
+  };
 
   useEffect(() => {
     const fetchQuestion = async () => {
@@ -73,71 +92,104 @@ export default function PhysicsLab() {
   };
 
   const handleSubmit = async () => {
-    // if (!selectedOptionId || userAnswer) {
-    //   setFeedbackMessage("Please select an option first");
-    //   setFeedbackType("error");
-    //   setShowFeedback(true);
-    //   setTimeout(() => setShowFeedback(false), 3000);
-    //   return;
-    // }
+    if (!selectedOption) {
+      setFeedbackMessage("Please select an option first");
+      setFeedbackType("error");
+      setShowFeedback(true);
+      setTimeout(() => setShowFeedback(false), 3000);
+      return;
+    }
+    let socData = null;
 
     setSubmitted(true);
 
-    // API call
-    const openaiKey = process.env.NEXT_PUBLIC_OPENAI_API_KEY;
+    const isAnswerCorrect = selectedOption === questionData.question.correct_quiz_answer;
 
-    const payload = {
-      openai_api_key: openaiKey,
-      model: "gpt-4o",
-      complex_question: questionData.question.complex_question,
-      actual_answer: "string", // Replace with actual answer if available
-      correct_answer: questionData.question.correct_quiz_answer,
-      student_answer: selectedOption,
-    };
+    if (isAnswerCorrect) {
+      setFeedbackMessage("Correct! selected answer is correct");
+      setFeedbackType("success");
+      setShowFeedback(true);
+      setTimeout(() => setShowFeedback(false), 3000);
+      return;
+    }
 
+    // Incorrect answer - start reasoning path
     try {
-      const res = await fetch(
-        "http://44.202.53.50:8000/vhm/get_first_soc_question",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(payload),
-        }
-      );
+      setFeedbackMessage(
+        "Incorrect! selected answer is incorrect, starting reasoning path..."
+      )
+      setFeedbackType("error");
+      setShowFeedback(true);
+      const actAnswerPayload = {
+        user_content: selectedOption,
+        openai_api_key: openaiKey,
+        model: "gpt-4o",
+        collection_name: quizFilename,
+        top_k: 5,
+      };
 
-      const data = await res.json();
-      console.log("API Response:", data);
+      const actAnswerRes = await fetch("http://44.202.53.50:8000/vhm/get_act_answer", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(actAnswerPayload),
+      });
+
+      const actAnswerData = await actAnswerRes.json();
+      const actual_answer = actAnswerData.assistant_response;
+
+      const socPayload = {
+        openai_api_key: openaiKey,
+        model: "gpt-4o",
+        complex_question: questionData.question.complex_question,
+        actual_answer,
+        correct_answer: questionData.question.correct_quiz_answer,
+        student_answer: selectedOption,
+      };
+
+      const socRes = await fetch("http://44.202.53.50:8000/vhm/get_first_soc_question", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(socPayload),
+      });
+
+      socData = await socRes.json();
+      console.log("SOC Response:", socData);
+
     } catch (error) {
       console.error("API call failed:", error);
     }
 
-    // Feedback logic
-    if (selectedOptionId === correctAnswer) {
-      setFeedbackMessage("Correct! The stone has more inertia.");
-      setFeedbackType("success");
-      setShowFeedback(true);
-      setTimeout(() => setShowFeedback(false), 3000);
-    } else {
-      setChatActive(true);
-      setTimeout(() => {
-        setMessages([
-          {
-            type: "ai",
-            content:
-              "I noticed you selected an incorrect answer. Let's discuss inertia a bit more. Can you tell me what factors affect an object's inertia?",
-          },
-        ]);
-      }, 800);
-    }
+    // Trigger AI feedback message
+    setShowFeedback(false);
+    setChatActive(true);
+    setTimeout(() => {
+      setMessages([
+        {
+          "role": "assistant",
+          content: questionData.question.complex_question,
+        },
+        {
+          "role": "user",
+          content: selectedOption
+        },
+        {
+          "role": "assistant",
+          content: generateRandomFeedback()
+        },
+        {
+          "role": "assistant",
+          content: socData.sub_question
+        }
+      ]);
+    }, 800);
   };
+
 
   const sendMessage = () => {
     if (!userMessage.trim()) return;
 
     // Add user message 
-    setMessages((prev) => [...prev, { type: "user", content: userMessage }]);
+    setMessages((prev) => [...prev, { role: "user", content: userMessage }]);
 
     // Clear input
     setUserMessage("");
@@ -147,7 +199,7 @@ export default function PhysicsLab() {
       const aiResponse =
         "That's a good point. Inertia is directly proportional to mass. Objects with greater mass have more inertia, meaning they resist changes in motion more. Since a stone has greater mass than a rubber ball of the same size, it has more inertia.";
 
-      setMessages((prev) => [...prev, { type: "ai", content: aiResponse }]);
+      setMessages((prev) => [...prev, { "role": "assistant", content: aiResponse }]);
     }, 1000);
   };
 
@@ -179,7 +231,7 @@ export default function PhysicsLab() {
       {/* Left Menu - Collapsible */}
       <div
         className={cn(
-          "fixed md:relative z-40 h-full transition-all duration-300 ease-in-out bg-gradient-to-b from-[#0c0e1d] to-[#0a0c17] border-r border-[#1a1e36]",
+          "fixed  md:relative z-40 h-full h-screen transition-all duration-300 ease-in-out bg-gradient-to-b from-[#0c0e1d] to-[#0a0c17] border-r border-[#1a1e36]",
           menuOpen ? "w-64" : "w-16"
         )}
       >
@@ -266,26 +318,7 @@ export default function PhysicsLab() {
                 <h2 className="text-2xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-indigo-400">
                   Physics Experiment
                 </h2>
-                <div className="relative">
-                  <div className="absolute -inset-0.7 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-md blur opacity-75"></div>
-                  <Button
-                    variant="outline"
-                    disabled={questionData?.is_first === true}
-                    className="relative bg-[#0c0e1d] hover:bg-[#161a36] text-white border-purple-700/50"
-                    onClick={previousQuestion}
-                  >
-                    <ChevronLeft size={16} className="mr-1" /> prev
-                  </Button>
-                  <Button
-                    variant="outline"
-                    disabled={questionData?.is_last === true}
-                    className="relative bg-[#0c0e1d] hover:bg-[#161a36] text-white border-purple-700/50"
-                    onClick={nextQuestion}
-                  >
-                    Next
-                    <ChevronRight size={16} className="ml-1" />
-                  </Button>
-                </div>
+
               </div>
 
               {/* Feedback message */}
@@ -303,12 +336,33 @@ export default function PhysicsLab() {
               )}
 
               <div className="mb-6">
-                <div className="flex items-center mb-2">
-                  <div className="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
-                  <p className="text-gray-300 text-sm">
-                    Question {questionData?.current_index + 1} /{" "}
-                    {questionData?.total_questions + 1}
-                  </p>
+                <div className="flex items-center justify-between mb-2">
+                  <div className="flex items-center">
+                    <div className="w-2 h-2 rounded-full bg-purple-500 mr-2"></div>
+                    <p className="text-gray-300 text-sm">
+                      Question {questionData?.current_index + 1} /{" "}
+                      {questionData?.total_questions + 1}
+                    </p>
+                  </div>
+                  <div className="relative flex items-center gap-2">
+                    <div className="absolute -inset-0.7 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-md blur opacity-75"></div>
+                    <Button
+                      variant="outline"
+                      disabled={questionData?.is_first === true}
+                      className="relative bg-[#0c0e1d] hover:bg-[#161a36] text-white border-purple-700/50"
+                      onClick={previousQuestion}
+                    >
+                      <ChevronLeft size={16} className="mr-1" />
+                    </Button>
+                    <Button
+                      variant="outline"
+                      disabled={questionData?.is_last === true}
+                      className="relative bg-[#0c0e1d] hover:bg-[#161a36] text-white border-purple-700/50"
+                      onClick={nextQuestion}
+                    >
+                      <ChevronRight size={16} className="ml-1" />
+                    </Button>
+                  </div>
                 </div>
                 {/* <div className="bg-[#0c0e1d] p-5 rounded-lg border border-[#1a1e36] shadow-[0_0_15px_rgba(123,58,237,0.1)]">
                   <p className="text-white">
@@ -412,25 +466,25 @@ export default function PhysicsLab() {
                       key={index}
                       className={cn(
                         "mb-4 p-3 rounded-lg max-w-[90%]",
-                        message.type === "ai"
+                        message.role === "assistant"
                           ? "bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/20 ml-0 mr-auto"
                           : "bg-[#2a2d35] ml-auto mr-0"
                       )}
                     >
-                      <div className="flex items-start">
+                      <div className="flex items-center justify-start">
                         <div
                           className={cn(
-                            "mr-2 p-1 rounded-full",
-                            message.type === "ai"
+                            "mr-1 p-1 rounded-full  ",
+                            message.role === "assistant"
                               ? "text-purple-400 bg-purple-900/50"
                               : "text-gray-400 bg-gray-800/50"
                           )}
                         >
-                          {message.type === "ai" ? "💬" : "👤"}
+                          {message.role === "assistant" ? <BotMessageSquare /> : <CircleUserRound size={22} />}
                         </div>
                         <p className="text-white">{message.content}</p>
 
-                        {message.type === "ai" && (
+                        {message.role === "assistant" && (
                           <div key={index}>
                             <TextToSpeech
                               id={index.toString()}
