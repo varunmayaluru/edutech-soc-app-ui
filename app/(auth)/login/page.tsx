@@ -6,18 +6,31 @@ import { useState } from "react"
 import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, User, Lock } from "lucide-react"
+import { Eye, EyeOff, User, Lock, Github } from "lucide-react"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [rememberMe, setRememberMe] = useState(false)
   const router = useRouter()
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     // In a real app, you would validate and authenticate here
     // For now, we'll just redirect to the dashboard
+    router.push("/")
+  }
+
+  const handleGoogleLogin = () => {
+    // In a real app, you would implement Google OAuth here
+    console.log("Google login clicked")
+    router.push("/")
+  }
+
+  const handleGithubLogin = () => {
+    // In a real app, you would implement GitHub OAuth here
+    console.log("GitHub login clicked")
     router.push("/")
   }
 
@@ -89,6 +102,20 @@ export default function LoginPage() {
               </div>
             </div>
 
+            {/* Remember Me Checkbox */}
+            <div className="flex items-center">
+              <input
+                type="checkbox"
+                id="remember-me"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="h-4 w-4 text-[#1e74bb] focus:ring-[#1e74bb] border-[#d8d7e0] rounded"
+              />
+              <label htmlFor="remember-me" className="ml-2 block text-sm text-[#5b5772]">
+                Remember me
+              </label>
+            </div>
+
             <button
               type="submit"
               className="w-full py-3 px-4 bg-[#1e74bb] text-white font-medium rounded-md hover:bg-[#1a67a7] focus:outline-none focus:ring-2 focus:ring-[#1e74bb] focus:ring-opacity-50 transition-colors"
@@ -96,6 +123,47 @@ export default function LoginPage() {
               Login
             </button>
           </form>
+
+          {/* Divider */}
+          <div className="relative flex items-center justify-center mt-6">
+            <div className="border-t border-[#d8d7e0] absolute w-full"></div>
+            <div className="bg-white px-4 relative text-sm text-[#5b5772]">OR</div>
+          </div>
+
+          {/* Social Login Buttons - Side by Side */}
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <button
+              onClick={handleGoogleLogin}
+              className="flex items-center justify-center py-3 px-2 border border-[#d8d7e0] rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e74bb] focus:ring-opacity-50 transition-colors"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20" className="mr-2">
+                <path
+                  fill="#EA4335"
+                  d="M5.26620003,9.76452941 C6.19878754,6.93863203 8.85444915,4.90909091 12,4.90909091 C13.6909091,4.90909091 15.2181818,5.50909091 16.4181818,6.49090909 L19.9090909,3 C17.7818182,1.14545455 15.0545455,0 12,0 C7.27006974,0 3.1977497,2.69829785 1.23999023,6.65002441 L5.26620003,9.76452941 Z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M16.0407269,18.0125889 C14.9509167,18.7163016 13.5660892,19.0909091 12,19.0909091 C8.86648613,19.0909091 6.21911939,17.076871 5.27698177,14.2678769 L1.23746264,17.3349879 C3.19279051,21.2970142 7.26500293,24 12,24 C14.9328362,24 17.7353462,22.9573905 19.834192,20.9995801 L16.0407269,18.0125889 Z"
+                />
+                <path
+                  fill="#4A90E2"
+                  d="M19.834192,20.9995801 C22.0291676,18.9520994 23.4545455,15.903663 23.4545455,12 C23.4545455,11.2909091 23.3454545,10.5272727 23.1818182,9.81818182 L12,9.81818182 L12,14.4545455 L18.4363636,14.4545455 C18.1187732,16.013626 17.2662994,17.2212117 16.0407269,18.0125889 L19.834192,20.9995801 Z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.27698177,14.2678769 C5.03832634,13.556323 4.90909091,12.7937589 4.90909091,12 C4.90909091,11.2182781 5.03443647,10.4668121 5.26620003,9.76452941 L1.23999023,6.65002441 C0.43658717,8.26043162 0,10.0753848 0,12 C0,13.9195484 0.444780743,15.7301709 1.23746264,17.3349879 L5.27698177,14.2678769 Z"
+                />
+              </svg>
+              <span className="text-sm">Google</span>
+            </button>
+            <button
+              onClick={handleGithubLogin}
+              className="flex items-center justify-center py-3 px-2 border border-[#d8d7e0] rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#1e74bb] focus:ring-opacity-50 transition-colors"
+            >
+              <Github className="w-5 h-5 mr-2" />
+              <span className="text-sm">GitHub</span>
+            </button>
+          </div>
 
           {/* Forgot Password and Register */}
           <div className="mt-6 text-center">

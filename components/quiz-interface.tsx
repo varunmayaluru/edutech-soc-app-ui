@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { AlertCircle, ChevronLeft, ChevronRight, X, Search, MoreHorizontal } from "lucide-react"
+import { AlertCircle, ChevronLeft, ChevronRight, X, Search, MoreHorizontal, Bot, User } from "lucide-react"
 import { useRouter } from "next/navigation"
 import SuccessModal from "./success-modal"
 
@@ -20,6 +20,13 @@ export default function QuizInterface({ quiz, breadcrumb }: QuizInterfaceProps) 
   const [showChat, setShowChat] = useState(false)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
   const [selectedTopic, setSelectedTopic] = useState<any | null>(null)
+  const [chatInput, setChatInput] = useState("")
+  const [messages, setMessages] = useState([
+    {
+      sender: "assistant",
+      text: "I noticed you selected an incorrect answer. How can I help you understand this concept better?",
+    },
+  ])
   const router = useRouter()
 
   // Options with correct/incorrect flags
@@ -55,8 +62,16 @@ export default function QuizInterface({ quiz, breadcrumb }: QuizInterfaceProps) 
   const handleOptionSelect = (index: number) => {
     setSelectedOption(index)
     const selectedQuizOption = quizOptions.find((option) => option.id === index)
+
     if (selectedQuizOption && !selectedQuizOption.isCorrect) {
       setShowChat(true)
+      // Reset chat messages when a new incorrect option is selected
+      setMessages([
+        {
+          sender: "assistant",
+          text: "I noticed you selected an incorrect answer. Let me help you understand this concept better.",
+        },
+      ])
     } else {
       setShowChat(false)
     }
@@ -70,6 +85,28 @@ export default function QuizInterface({ quiz, breadcrumb }: QuizInterfaceProps) 
     setShowSuccessModal(false)
     const topicId = quiz.topicId || "arithmetic-number-sense"
     router.push(`/subjects/${quiz.subjectId}/${topicId}/${quiz.id}/results`)
+  }
+
+  const handleSendMessage = () => {
+    if (chatInput.trim() === "") return
+
+    // Add user message
+    const newMessages = [...messages, { sender: "user", text: chatInput }]
+    setMessages(newMessages)
+    setChatInput("")
+
+    // Simulate assistant response after a short delay
+    setTimeout(() => {
+      let responseText =
+        "I understand your question. For this algebraic expression, remember that we need to combine like terms. When simplifying '3x + 5 - x + 2', we group the variables (3x - x = 2x) and constants (5 + 2 = 7) to get '2x + 7'."
+
+      if (chatInput.toLowerCase().includes("help") || chatInput.toLowerCase().includes("understand")) {
+        responseText =
+          "Let me help you understand this better. When simplifying algebraic expressions, we need to combine like terms. Like terms have the same variables raised to the same powers. In this case, '3x' and '-x' are like terms because they both have the variable 'x' to the power of 1."
+      }
+
+      setMessages([...newMessages, { sender: "assistant", text: responseText }])
+    }, 1000)
   }
 
   return (
@@ -159,57 +196,119 @@ export default function QuizInterface({ quiz, breadcrumb }: QuizInterfaceProps) 
           </div>
         </div>
 
-        {/* Simplified chat section */}
+        {/* Help Assistant Chat Section */}
         {showChat && (
-          <div className="bg-white rounded-lg p-6 shadow-sm mb-6">
-            <div className="flex items-center justify-between mb-4">
+          <div
+            className="bg-white rounded-lg shadow-sm mb-6 border border-gray-200 overflow-hidden"
+            ref={(el) => {
+              if (el && selectedOption !== null) {
+                // Auto scroll to chat when it becomes visible
+                el.scrollIntoView({ behavior: "smooth", block: "center" })
+              }
+            }}
+          >
+            <div className="flex items-center justify-between p-3 border-b border-gray-100">
               <div className="flex items-center">
-                <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center mr-3">
-                  <AlertCircle className="h-5 w-5 text-white" />
+                <div className="w-8 h-8 rounded-full bg-[#1e74bb] flex items-center justify-center mr-2">
+                  <Bot size={16} className="text-white" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-medium">Help Assistant</h3>
+                  <h3 className="text-sm font-medium">Help Assistant</h3>
                   <p className="text-xs text-gray-500">Always here to help</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowChat(false)}
-                className="text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full p-2"
+                className="text-gray-500 hover:text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-full p-1"
               >
-                <X className="h-5 w-5" />
+                <X className="h-4 w-4" />
               </button>
             </div>
 
-            <div className="h-40 overflow-y-auto p-4 bg-gray-50 rounded-lg mb-4 border border-gray-100">
-              <p className="text-sm">
-                Let me explain this concept further. When simplifying algebraic expressions, we need to combine like
-                terms. In the expression '3x + 5 - x + 2', the like terms are '3x' and '-x', which combine to '2x'. The
-                constants '5' and '2' combine to '7'. So the final simplified expression is '2x + 7'.
-              </p>
+            <div
+              className="h-80 overflow-y-auto p-3 bg-blue-50"
+              ref={(el) => {
+                // Auto scroll to bottom when messages change
+                if (el) {
+                  el.scrollTop = el.scrollHeight
+                }
+              }}
+            >
+              <div className="space-y-3">
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`flex items-start ${message.sender === "assistant" ? "justify-start" : "justify-end"}`}
+                  >
+                    {message.sender === "assistant" && (
+                      <div className="flex-shrink-0 mr-2">
+                        <div className="w-7 h-7 rounded-full bg-[#1e74bb] flex items-center justify-center">
+                          <Bot size={14} className="text-white" />
+                        </div>
+                      </div>
+                    )}
+                    <div
+                      className={`max-w-[75%] p-2 rounded-lg ${
+                        message.sender === "assistant"
+                          ? "bg-white text-gray-800 border border-gray-100 shadow-sm"
+                          : "bg-[#1e74bb] text-white"
+                      }`}
+                    >
+                      <p className="text-sm">{message.text}</p>
+                      <p className="text-xs mt-1 opacity-60">
+                        {message.sender === "assistant" ? "Just now" : "1 min ago"}
+                      </p>
+                    </div>
+                    {message.sender === "user" && (
+                      <div className="flex-shrink-0 ml-2">
+                        <div className="w-7 h-7 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
+                          {/* If user has profile photo, use it, otherwise show icon */}
+                          <User size={14} className="text-gray-600" />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
 
-            <div className="relative">
-              <input
-                type="text"
-                placeholder="Ask for help with this question..."
-                className="w-full border border-gray-300 rounded-full py-3 pl-5 pr-16"
-              />
-              <button className="absolute right-2 top-1/2 transform -translate-y-1/2 bg-[#1e74bb] text-white p-2 rounded-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  width="18"
-                  height="18"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                >
-                  <path d="m22 2-7 20-4-9-9-4Z" />
-                  <path d="M22 2 11 13" />
-                </svg>
-              </button>
+            <div className="p-3 border-t border-gray-100">
+              <div className="relative">
+                <input
+                  type="text"
+                  value={chatInput}
+                  onChange={(e) => setChatInput(e.target.value)}
+                  placeholder="Ask for help with this question..."
+                  className="w-full border border-gray-300 rounded-full py-2 pl-4 pr-12 text-sm focus:outline-none focus:ring-2 focus:ring-[#1e74bb] focus:border-transparent"
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && chatInput.trim() !== "") {
+                      handleSendMessage()
+                    }
+                  }}
+                />
+                <div className="absolute right-1 top-1/2 transform -translate-y-1/2">
+                  <button
+                    className="bg-[#1e74bb] text-white p-1.5 rounded-full hover:bg-[#1a65a5] transition-colors"
+                    onClick={handleSendMessage}
+                    disabled={chatInput.trim() === ""}
+                  >
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="16"
+                      height="16"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="m22 2-7 20-4-9-9-4Z" />
+                      <path d="M22 2 11 13" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         )}
