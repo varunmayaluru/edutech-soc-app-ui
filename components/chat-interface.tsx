@@ -1,99 +1,133 @@
 "use client"
-import { cn } from "@/lib/utils"
-import { Send, FlaskRoundIcon as Flask, BotMessageSquare, CircleUserRound } from "lucide-react"
-import TextToSpeech from "@/components/ui/TextToSpeech"
-import { SpeechProvider } from "@/components/ui/SpeechProvider"
 
-interface Message {
-  role: "assistant" | "user"
+import { useState } from "react"
+import Image from "next/image"
+import { Send } from "lucide-react"
+
+type Message = {
+  id: number
+  sender: "user" | "assistant"
   content: string
+  timestamp: string
 }
 
-interface ChatInterfaceProps {
-  messages: Message[]
-  setMessages: (messages: Message[]) => void
-  userMessage: string
-  setUserMessage: (message: string) => void
-  sendMessage: () => void
-}
+export default function ChatInterface() {
+  const [messages, setMessages] = useState<Message[]>([
+    {
+      id: 1,
+      sender: "user",
+      content: "you're a UX writer now. Generate 3 versions of 404 error messages for a ecommerce clothing website.",
+      timestamp: "1 min ago",
+    },
+    {
+      id: 2,
+      sender: "assistant",
+      content: `Here are three different versions of 404 error messages for an ecommerce clothing website:
 
-export function ChatInterface({ messages, setMessages, userMessage, setUserMessage, sendMessage }: ChatInterfaceProps) {
+1. Uh-oh! It looks like the page you're looking for isn't here. Please check the URL and try again or return to the homepage to continue shopping.
+
+2. Whoops! We can't seem to find the page you're looking for. Please double-check the URL or use our search to find what you need. You can also browse our collection of stylish clothes and accessories.
+
+3. Sorry, the page you're trying to access isn't available. It's possible that the item has sold out or the page has moved. Please try our search function or return to browsing.`,
+      timestamp: "Just now",
+    },
+  ])
+
+  const [newMessage, setNewMessage] = useState("")
+
+  const handleSendMessage = () => {
+    if (newMessage.trim() === "") return
+
+    const message: Message = {
+      id: messages.length + 1,
+      sender: "user",
+      content: newMessage,
+      timestamp: "Just now",
+    }
+
+    setMessages([...messages, message])
+    setNewMessage("")
+
+    // Simulate assistant response
+    setTimeout(() => {
+      const response: Message = {
+        id: messages.length + 2,
+        sender: "assistant",
+        content: "I'm processing your request. Please wait a moment...",
+        timestamp: "Just now",
+      }
+
+      setMessages((prev) => [...prev, response])
+    }, 1000)
+  }
+
   return (
-    <div className="w-full md:w-1/2 p-6 border-t md:border-t-0 md:border-l border-[#1a1e36] animate-slide-in-right dark:border-[#1a1e36] light:border-slate-200">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-cyan-400">
-          AI Assistant
-        </h2>
-        <div className="flex items-center">
-          <div className="w-2 h-2 rounded-full bg-green-500 mr-2 animate-pulse"></div>
-          <span className="text-green-400 text-sm">Active</span>
-        </div>
-      </div>
-
-      <div className="space-y-4 mb-4 h-[calc(100vh-200px)] overflow-y-auto pr-2 custom-scrollbar">
-        <SpeechProvider>
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={cn(
-                "mb-4 p-3 rounded-lg max-w-[90%]",
-                message.role === "assistant"
-                  ? "bg-gradient-to-r from-purple-900/30 to-cyan-900/30 border border-purple-500/20 ml-0 mr-auto dark:from-purple-900/30 dark:to-cyan-900/30 dark:border-purple-500/20 light:from-purple-100 light:to-cyan-100 light:border-purple-200"
-                  : "bg-[#2a2d35] ml-auto mr-0 dark:bg-[#2a2d35] light:bg-slate-200",
-              )}
-            >
-              <div className="flex items-center justify-start">
-                <div
-                  className={cn(
-                    "mr-1 p-1 rounded-full",
-                    message.role === "assistant"
-                      ? "text-purple-400 bg-purple-900/50 dark:text-purple-400 dark:bg-purple-900/50 light:text-purple-600 light:bg-purple-200"
-                      : "text-gray-400 bg-gray-800/50 dark:text-gray-400 dark:bg-gray-800/50 light:text-gray-600 light:bg-gray-300",
-                  )}
-                >
-                  {message.role === "assistant" ? <BotMessageSquare size={22} /> : <CircleUserRound size={22} />}
+    <div className="flex flex-col h-[calc(100vh-300px)]">
+      <div className="flex-1 overflow-y-auto mb-4 space-y-4">
+        {messages.map((message) => (
+          <div key={message.id} className="flex mb-4">
+            {message.sender === "assistant" ? (
+              <div className="flex">
+                <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 mr-2">
+                  <Image
+                    src="/images/helpful-robot.png"
+                    alt="AI Assistant"
+                    width={32}
+                    height={32}
+                    className="object-cover"
+                  />
                 </div>
-                <p className="text-white dark:text-white light:text-gray-800">{message.content}</p>
-
-                {message.role === "assistant" && (
-                  <div key={index}>
-                    <TextToSpeech id={index.toString()} message={message.content} />
+                <div className="max-w-[85%]">
+                  <div className="font-medium text-sm">
+                    Response <span className="text-xs text-gray-500 font-normal">{message.timestamp}</span>
                   </div>
-                )}
+                  <div className="bg-blue-100 p-3 rounded-lg mt-1 text-sm whitespace-pre-wrap">{message.content}</div>
+                  <div className="flex mt-2 space-x-2">
+                    <button className="bg-gray-200 text-xs px-2 py-1 rounded-full">👍</button>
+                    <button className="bg-gray-200 text-xs px-2 py-1 rounded-full">👎</button>
+                    <button className="bg-blue-100 text-xs px-2 py-1 rounded-full text-blue-700">
+                      Generate Response
+                    </button>
+                    <button className="bg-blue-100 text-xs px-2 py-1 rounded-full text-blue-700">Copy</button>
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
-        </SpeechProvider>
-        {messages.length === 0 && (
-          <div className="flex flex-col items-center justify-center h-full text-center text-gray-500">
-            <div className="w-16 h-16 rounded-full bg-[#161a36] flex items-center justify-center mb-4 dark:bg-[#161a36] light:bg-slate-100">
-              <Flask size={32} className="text-purple-400" />
-            </div>
-            <p className="text-lg mb-2">AI Assistant Activated</p>
-            <p className="text-sm max-w-xs">
-              The AI has detected you need help with this concept and is ready to assist you.
-            </p>
+            ) : (
+              <div className="flex">
+                <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0 mr-2">
+                  <Image src="/images/user-avatar.jpg" alt="User" width={32} height={32} className="object-cover" />
+                </div>
+                <div className="max-w-[85%]">
+                  <div className="font-medium text-sm">
+                    You <span className="text-xs text-gray-500 font-normal">{message.timestamp}</span>
+                  </div>
+                  <div className="bg-gray-100 p-3 rounded-lg mt-1 text-sm">{message.content}</div>
+                </div>
+              </div>
+            )}
           </div>
-        )}
+        ))}
       </div>
 
-      {/* Message input */}
-      <div className="relative">
-        <div className="absolute -inset-0.5 bg-gradient-to-r from-purple-600 to-indigo-600 rounded-lg blur opacity-30"></div>
-        <div className="relative flex">
+      <div className="border-t pt-4">
+        <div className="relative">
           <input
             type="text"
-            placeholder="Type your response..."
-            className="w-full bg-[#0c0e1d] border border-[#1a1e36] rounded-lg py-3 px-4 text-white pr-12 focus:outline-none focus:ring-1 focus:ring-purple-500 focus:border-purple-500 dark:bg-[#0c0e1d] dark:border-[#1a1e36] dark:text-white light:bg-white light:border-slate-200 light:text-gray-800"
-            value={userMessage}
-            onChange={(e) => setUserMessage(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && sendMessage()}
+            value={newMessage}
+            onChange={(e) => setNewMessage(e.target.value)}
+            placeholder="Type message..."
+            className="w-full border border-gray-300 rounded-full py-2 pl-4 pr-10"
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                handleSendMessage()
+              }
+            }}
           />
           <button
-            className="absolute right-3 top-1/2 transform -translate-y-1/2 text-white bg-gradient-to-r from-purple-600 to-indigo-600 rounded-full p-1.5 hover:from-purple-700 hover:to-indigo-700 transition-all"
-            onClick={sendMessage}
+            className="absolute right-2 top-1/2 transform -translate-y-1/2 text-[#1e74bb]"
+            onClick={handleSendMessage}
           >
-            <Send size={16} />
+            <Send className="h-5 w-5" />
           </button>
         </div>
       </div>

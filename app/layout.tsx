@@ -1,28 +1,24 @@
 import type React from "react"
-import "@/app/globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
+import type { Metadata } from "next"
+import { Inter } from "next/font/google"
+import "./globals.css"
 
-export const metadata = {
-  title: "The Physics Lab",
-  description: "Interactive physics learning platform",
-  generator: "v0.dev",
+const inter = Inter({ subsets: ["latin"] })
+
+export const metadata: Metadata = {
+  title: "ProbEd - Education Platform",
+  description: "Learn through interactive quizzes and topics",
+    generator: 'v0.dev'
 }
 
 export default function RootLayout({
   children,
-}: {
+}: Readonly<{
   children: React.ReactNode
-}) {
+}>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="min-h-screen bg-[#050714] font-sans antialiased dark:bg-[#050714] light:bg-white">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem>
-          <main>{children}</main>
-        </ThemeProvider>
-      </body>
+    <html lang="en">
+      <body className={inter.className}>{children}</body>
     </html>
   )
 }
-
-
-import './globals.css'
