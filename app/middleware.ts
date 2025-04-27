@@ -3,26 +3,26 @@ import type { NextRequest } from "next/server"
 
 // This function can be marked `async` if using `await` inside
 export function middleware(request: NextRequest) {
-  // For a real app, you would check for a valid session/token here
-  // This is just a simple example
-
   // Check if the user is trying to access a protected route
-  const isProtectedRoute = !request.nextUrl.pathname.startsWith("/login")
+  const isProtectedRoute =
+    !request.nextUrl.pathname.startsWith("/login") &&
+    !request.nextUrl.pathname.startsWith("/register") &&
+    !request.nextUrl.pathname.startsWith("/_next") &&
+    !request.nextUrl.pathname.startsWith("/api") &&
+    !request.nextUrl.pathname.includes(".")
 
-  // For demo purposes, we'll just allow all access
-  // In a real app, you would redirect to login if not authenticated
-
-  // Uncomment this to enable authentication protection
-  /*
   if (isProtectedRoute) {
     // Check for authentication (this is just a placeholder)
-    const isAuthenticated = request.cookies.has('auth_token')
-    
-    if (!isAuthenticated) {
-      return NextResponse.redirect(new URL('/login', request.url))
+    const token = request.cookies.get("token")?.value || request.headers.get("Authorization")?.split(" ")[1]
+
+    if (!token) {
+      // Redirect to login if no token is found
+      return NextResponse.redirect(new URL("/login", request.url))
     }
+
+    // In a real app, you would also verify the token's validity here
+    // This could involve checking expiration, signature, etc.
   }
-  */
 
   return NextResponse.next()
 }

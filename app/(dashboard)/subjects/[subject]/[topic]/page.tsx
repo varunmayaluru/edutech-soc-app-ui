@@ -1,7 +1,6 @@
 import { notFound } from "next/navigation"
-import SchoolHeader from "@/components/school-header"
-import QuizList from "@/components/quiz-list"
 import { getSubject, getTopic } from "@/lib/data"
+import QuizList from "@/components/quiz-list"
 
 export default function TopicPage({
   params,
@@ -17,21 +16,13 @@ export default function TopicPage({
 
   return (
     <div>
-      <div className="bg-[#1e74bb] text-white p-8">
+      <div className="bg-[#1e74bb] text-white p-6">
         <h1 className="text-2xl font-medium mb-2">Welcome to the {subject.name}.</h1>
         <p>Select a topic below to explore concepts, examples, and practice quizzes.</p>
-
-        <div className="absolute top-8 right-8 text-white">
-          <span>
-            {subject.category} / {subject.name}
-          </span>
-        </div>
       </div>
 
       <div className="p-6">
-        <SchoolHeader title="School Name" />
-
-        <h2 className="text-xl font-medium mt-6 mb-4">Quiz</h2>
+        <h2 className="text-xl font-medium mt-6 mb-4">Quizzes</h2>
         <QuizList topicId={params.topic} />
       </div>
     </div>

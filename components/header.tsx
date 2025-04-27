@@ -1,8 +1,19 @@
+"use client"
+
 import Link from "next/link"
 import Image from "next/image"
 import { Search, Bell, MessageSquare, LogOut, Settings, User, HelpCircle } from "lucide-react"
+import { useRouter } from "next/navigation"
+import { removeToken } from "@/lib/auth"
 
 export default function Header() {
+  const router = useRouter()
+
+  const handleLogout = () => {
+    removeToken()
+    router.push("/login")
+  }
+
   return (
     <header className="border-b border-gray-200 py-3 px-6 flex items-center justify-between bg-white">
       <div className="flex items-center">
@@ -13,16 +24,26 @@ export default function Header() {
           <span className="text-[#1e74bb] text-xl font-medium">ProbEd</span>
         </Link>
 
-        <div className="relative ml-8 hidden sm:block">
-          <div className="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
-            <Search className="h-4 w-4 text-gray-400" />
-          </div>
-          <input
-            type="text"
-            placeholder="Search here"
-            className="pl-10 pr-4 py-2 w-64 border border-gray-200 rounded-md text-sm"
+        <div className="ml-8 flex items-center">
+          <Image
+            src="https://v0.blob.com/Yd9Ij.png"
+            alt="Delhi Public School"
+            width={120}
+            height={50}
+            className="h-10 w-auto"
           />
         </div>
+      </div>
+
+      <div className="relative mx-auto max-w-md w-full px-4">
+        <div className="absolute inset-y-0 left-4 flex items-center pl-3 pointer-events-none">
+          <Search className="h-4 w-4 text-gray-400" />
+        </div>
+        <input
+          type="text"
+          placeholder="Search here"
+          className="pl-10 pr-4 py-2 w-full border border-gray-200 rounded-full text-sm"
+        />
       </div>
 
       <div className="flex items-center">
@@ -34,13 +55,21 @@ export default function Header() {
         </button>
 
         <div className="flex items-center ml-4">
-          <div className="flex flex-col items-end mr-3 hidden sm:block">
-            <span className="font-medium block text-gray-800">Eleanor Pena</span>
-            <span className="text-sm text-gray-500 block">Welcome back</span>
-          </div>
           <div className="relative group">
-            <div className="w-10 h-10 rounded-full overflow-hidden cursor-pointer">
-              <Image src="/images/user-avatar.jpg" alt="Eleanor Pena" width={40} height={40} className="object-cover" />
+            <div className="flex items-center">
+              <div className="w-10 h-10 rounded-full overflow-hidden cursor-pointer">
+                <Image
+                  src="/images/user-avatar.jpg"
+                  alt="Eleanor Pena"
+                  width={40}
+                  height={40}
+                  className="object-cover"
+                />
+              </div>
+              <div className="flex flex-col ml-3">
+                <span className="font-medium block text-gray-800">Eleanor Pena</span>
+                <span className="text-xs text-gray-500 block">Welcome to "Your name"</span>
+              </div>
             </div>
 
             {/* Dropdown menu */}
@@ -71,10 +100,13 @@ export default function Header() {
                 Help Center
               </Link>
               <div className="border-t border-gray-100 my-1"></div>
-              <Link href="/login" className="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center">
+              <button
+                onClick={handleLogout}
+                className="block px-4 py-2 text-sm text-red-600 hover:bg-red-50 flex items-center w-full text-left"
+              >
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
-              </Link>
+              </button>
             </div>
           </div>
         </div>
