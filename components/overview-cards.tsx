@@ -1,4 +1,5 @@
 import { BookOpen, CheckSquare, Clock } from "lucide-react"
+import Link from "next/link"
 
 export default function OverviewCards() {
   return (
@@ -12,8 +13,8 @@ export default function OverviewCards() {
         </div>
 
         <div className="flex items-center justify-between">
-          <p className="text-[#1e74bb] font-medium">6 Subjects</p>
-          <button className="text-gray-400 hover:text-gray-600">
+          <p className="text-green-600 font-medium">6 Subjects</p>
+          <Link href="/subjects" className="text-gray-400 hover:text-gray-600 flex items-center">
             <span className="text-sm">View Details</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -29,7 +30,7 @@ export default function OverviewCards() {
             >
               <path d="m9 18 6-6-6-6" />
             </svg>
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -42,10 +43,10 @@ export default function OverviewCards() {
         </div>
 
         <div className="flex items-center justify-between">
-          <p className="text-[#1e74bb] font-medium">
+          <p className="text-blue-600 font-medium">
             8 Tasks <span className="text-gray-400 text-sm">/12 Tasks</span>
           </p>
-          <button className="text-gray-400 hover:text-gray-600">
+          <Link href="/tasks" className="text-gray-400 hover:text-gray-600 flex items-center">
             <span className="text-sm">View Details</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -61,7 +62,7 @@ export default function OverviewCards() {
             >
               <path d="m9 18 6-6-6-6" />
             </svg>
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -74,10 +75,10 @@ export default function OverviewCards() {
         </div>
 
         <div className="flex items-center justify-between">
-          <p className="text-[#1e74bb] font-medium">
+          <p className="text-orange-600 font-medium">
             8 Hours <span className="text-gray-400 text-sm">In a week</span>
           </p>
-          <button className="text-gray-400 hover:text-gray-600">
+          <Link href="/hours" className="text-gray-400 hover:text-gray-600 flex items-center">
             <span className="text-sm">View Details</span>
             <svg
               xmlns="http://www.w3.org/2000/svg"
@@ -93,7 +94,7 @@ export default function OverviewCards() {
             >
               <path d="m9 18 6-6-6-6" />
             </svg>
-          </button>
+          </Link>
         </div>
       </div>
     </div>

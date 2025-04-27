@@ -6,11 +6,11 @@ export default function SubjectsList() {
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {subjects.map((subject) => (
         <div key={subject.id} className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
-          <div className="flex items-center mb-4">
-            <div className={`w-10 h-10 rounded-md ${subject.iconBg} flex items-center justify-center mr-3`}>
-              <span className={`${subject.iconColor}`}>{subject.icon}</span>
-            </div>
+          <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium">{subject.name}</h3>
+            <div className={`w-10 h-10 rounded-md flex items-center justify-center`}>
+              <span className="text-xl">{subject.icon}</span>
+            </div>
           </div>
 
           <div className="mb-4">
