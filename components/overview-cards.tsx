@@ -3,7 +3,7 @@ import Link from "next/link"
 export default function OverviewCards() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-      <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow">
+      <div className="card p-6">
         <div className="flex flex-col">
           <div className="flex items-center mb-2">
             <div className="w-5 h-5 bg-green-500 rounded-sm mr-2"></div>
@@ -33,7 +33,7 @@ export default function OverviewCards() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow">
+      <div className="card p-6">
         <div className="flex flex-col">
           <div className="flex items-center mb-2">
             <div className="w-5 h-5 bg-blue-500 rounded-sm mr-2"></div>
@@ -65,7 +65,7 @@ export default function OverviewCards() {
         </div>
       </div>
 
-      <div className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow">
+      <div className="card p-6">
         <div className="flex flex-col">
           <div className="flex items-center mb-2">
             <div className="w-5 h-5 bg-orange-500 rounded-sm mr-2"></div>

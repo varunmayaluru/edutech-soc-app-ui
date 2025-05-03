@@ -52,6 +52,8 @@ const config: Config = {
     },
   },
   plugins: [require("tailwindcss-animate")],
+  // Ensure Tailwind doesn't purge these important classes
+  safelist: ["rounded-lg", "rounded-md", "rounded-sm", "rounded-full", "card", "card-shadow", "rounded-card"],
 }
 
 export default config

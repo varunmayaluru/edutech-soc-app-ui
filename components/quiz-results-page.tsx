@@ -86,7 +86,7 @@ export default function QuizResultsPage({ quiz, results }: QuizResultsPageProps)
       {/* Results summary */}
       <div className="bg-gray-50 p-6">
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
-          <div className="bg-white rounded-lg p-4 shadow-md border border-gray-100 flex items-center">
+          <div className="card p-4 border border-gray-100 flex items-center" style={{ borderRadius: "0.5rem" }}>
             <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mr-3">
               <CheckCircle className="h-6 w-6 text-green-600" />
             </div>
@@ -96,7 +96,7 @@ export default function QuizResultsPage({ quiz, results }: QuizResultsPageProps)
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-4 shadow-md border border-gray-100 flex items-center">
+          <div className="card p-4 border border-gray-100 flex items-center" style={{ borderRadius: "0.5rem" }}>
             <div className="w-12 h-12 rounded-full bg-red-100 flex items-center justify-center mr-3">
               <XCircle className="h-6 w-6 text-red-600" />
             </div>
@@ -106,7 +106,7 @@ export default function QuizResultsPage({ quiz, results }: QuizResultsPageProps)
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-4 shadow-md border border-gray-100 flex items-center">
+          <div className="card p-4 border border-gray-100 flex items-center" style={{ borderRadius: "0.5rem" }}>
             <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mr-3">
               <FileQuestion className="h-6 w-6 text-gray-600" />
             </div>
@@ -116,7 +116,7 @@ export default function QuizResultsPage({ quiz, results }: QuizResultsPageProps)
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-4 shadow-md border border-gray-100 flex items-center">
+          <div className="card p-4 border border-gray-100 flex items-center" style={{ borderRadius: "0.5rem" }}>
             <div className="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center mr-3">
               <HelpCircle className="h-6 w-6 text-amber-600" />
             </div>
@@ -126,7 +126,7 @@ export default function QuizResultsPage({ quiz, results }: QuizResultsPageProps)
             </div>
           </div>
 
-          <div className="bg-white rounded-lg p-4 shadow-md border border-gray-100 flex items-center">
+          <div className="card p-4 border border-gray-100 flex items-center" style={{ borderRadius: "0.5rem" }}>
             <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mr-3">
               <GraduationCap className="h-6 w-6 text-blue-600" />
             </div>
@@ -140,7 +140,7 @@ export default function QuizResultsPage({ quiz, results }: QuizResultsPageProps)
         </div>
 
         {/* Quiz content */}
-        <div className="bg-white rounded-lg p-8 mb-6">
+        <div className="card p-8 mb-6" style={{ borderRadius: "0.5rem" }}>
           <div className="flex justify-center mb-6">
             <div className="w-20 h-20 rounded-full overflow-hidden">
               <Image

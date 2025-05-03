@@ -13,7 +13,7 @@ export default function QuizList({ topicId }: { topicId: string }) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {quizzes.map((quiz) => (
-        <div key={quiz.id} className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div key={quiz.id} className="card p-6" style={{ borderRadius: "0.5rem" }}>
           <div className="flex items-center mb-4">
             <div className="w-6 h-6 rounded-sm flex items-center justify-center mr-3">
               <div

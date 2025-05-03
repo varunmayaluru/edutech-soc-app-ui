@@ -16,7 +16,7 @@ export default function SubjectsList() {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {subjects.map((subject) => (
-        <div key={subject.id} className="bg-white rounded-lg p-6 shadow-md hover:shadow-lg transition-shadow">
+        <div key={subject.id} className="card p-6" style={{ borderRadius: "0.5rem" }}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium">{subject.name}</h3>
             <div className="w-10 h-10">

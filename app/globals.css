@@ -32,10 +32,18 @@ body {
   overflow: hidden;
 }
 
+/* Custom card styles with explicit border radius */
+.card {
+  @apply bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow;
+  border-radius: 0.5rem !important;
+  overflow: hidden;
+}
+
 /* Custom card shadow */
 .card-shadow {
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   transition: box-shadow 0.3s ease;
+  border-radius: 0.5rem !important;
 }
 
 .card-shadow:hover {
@@ -57,4 +65,10 @@ body {
 
 .logo-pulse {
   animation: logoPulse 2s infinite;
+}
+
+/* Explicit rounded corners for all cards */
+.rounded-card {
+  border-radius: 0.5rem !important;
+  overflow: hidden;
 }
