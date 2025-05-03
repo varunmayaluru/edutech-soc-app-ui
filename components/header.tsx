@@ -15,11 +15,11 @@ export default function Header() {
   }
 
   return (
-    <header className="border-b border-gray-200 py-3 px-6 flex items-center justify-between bg-white">
+    <header className="border-b border-gray-200 py-3 px-6 flex items-center justify-between bg-white shadow-sm">
       <div className="flex items-center">
         <Link href="/" className="flex items-center">
-          <div className="w-10 h-10 rounded-full bg-[#1e74bb] flex items-center justify-center mr-2">
-            <span className="text-white font-bold">P</span>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1e74bb] to-[#3661f5] flex items-center justify-center mr-2 shadow-md">
+            <span className="text-white font-bold text-xl">P</span>
           </div>
           <span className="text-[#1e74bb] text-xl font-medium">ProbEd</span>
         </Link>
@@ -57,7 +57,7 @@ export default function Header() {
         <div className="flex items-center ml-4">
           <div className="relative group">
             <div className="flex items-center">
-              <div className="w-10 h-10 rounded-full overflow-hidden cursor-pointer">
+              <div className="w-10 h-10 rounded-full overflow-hidden cursor-pointer shadow-md">
                 <Image
                   src="/images/user-avatar.jpg"
                   alt="Eleanor Pena"

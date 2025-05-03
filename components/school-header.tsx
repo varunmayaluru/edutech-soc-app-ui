@@ -1,7 +1,12 @@
 export default function SchoolHeader({ title }: { title: string }) {
   return (
     <div className="flex items-center">
-      <div className="w-10 h-10 rounded-full bg-[#1e74bb] flex items-center justify-center mr-3 text-white">
+      <div
+        className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1e74bb] to-[#3661f5] flex items-center justify-center mr-3 text-white shadow-md"
+        style={{
+          boxShadow: "0 4px 10px rgba(30, 116, 187, 0.3)",
+        }}
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           width="20"

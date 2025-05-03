@@ -7,48 +7,39 @@ import Image from "next/image"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { Eye, EyeOff, User, Lock } from "lucide-react"
-import { setToken } from "@/lib/auth"
+import { useAuth } from "@/contexts/auth-context"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const router = useRouter()
-  const [isLoading, setIsLoading] = useState(false)
+  const { login, error: authError, isLoading } = useAuth()
   const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setIsLoading(true)
     setError("")
 
     try {
-      const response = await fetch("http://localhost:5000/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ email, password }),
-      })
-
-      const data = await response.json()
-
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed")
-      }
-
-      // Store the JWT token using our utility
-      setToken(data.token)
-
-      // Redirect to dashboard
+      await login(email, password)
       router.push("/")
     } catch (err: any) {
-      setError(err.message || "An error occurred during login")
       console.error("Login error:", err)
-    } finally {
-      setIsLoading(false)
+
+      // Provide more user-friendly error messages
+      if (err.message?.includes("Failed to fetch") || err.message?.includes("NetworkError")) {
+        setError("Unable to connect to the server. Please check your internet connection or try again later.")
+      } else if (err.message?.includes("401")) {
+        setError("Invalid email or password. Please try again.")
+      } else {
+        setError(err.message || "An error occurred during login")
+      }
     }
   }
+
+  // Use auth error if available
+  const displayError = error || authError
 
   return (
     <div className="flex h-screen">
@@ -67,8 +58,8 @@ export default function LoginPage() {
 
         {/* Logo at top left */}
         <div className="absolute top-8 left-8 flex items-center">
-          <div className="w-10 h-10 rounded-full bg-[#1e74bb] flex items-center justify-center mr-2">
-            <span className="text-white font-bold">P</span>
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#1e74bb] to-[#3661f5] flex items-center justify-center mr-2 shadow-md">
+            <span className="text-white font-bold text-xl">P</span>
           </div>
           <span className="text-[#1e74bb] text-xl font-medium">ProbED</span>
         </div>
@@ -76,8 +67,8 @@ export default function LoginPage() {
         <div className="w-full max-w-md z-10">
           {/* Center logo */}
           <div className="flex justify-center mb-8">
-            <div className="w-16 h-16 rounded-full bg-[#1e74bb] flex items-center justify-center">
-              <span className="text-white text-2xl font-bold">P</span>
+            <div className="w-20 h-20 rounded-full bg-gradient-to-br from-[#1e74bb] to-[#3661f5] flex items-center justify-center shadow-lg">
+              <span className="text-white text-4xl font-bold">P</span>
             </div>
           </div>
 
@@ -85,8 +76,10 @@ export default function LoginPage() {
           <h1 className="text-3xl font-medium text-center mb-2">
             Welcome <span className="text-[#1e74bb]">ProbED</span>
           </h1>
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">{error}</div>
+          {displayError && (
+            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4 text-sm">
+              {displayError}
+            </div>
           )}
           <p className="text-center text-[#5b5772] mb-8">Login to your account</p>
 
@@ -144,7 +137,7 @@ export default function LoginPage() {
 
             <button
               type="submit"
-              className="w-full py-3 px-4 bg-[#1e74bb] text-white font-medium rounded-md hover:bg-[#1a67a7] focus:outline-none focus:ring-2 focus:ring-[#1e74bb] focus:ring-opacity-50 transition-colors"
+              className="w-full py-3 px-4 bg-[#1e74bb] text-white font-medium rounded-md hover:bg-[#1a67a7] focus:outline-none focus:ring-2 focus:ring-[#1e74bb] focus:ring-opacity-50 transition-colors shadow-md"
               disabled={isLoading}
             >
               {isLoading ? "Logging in..." : "Login"}

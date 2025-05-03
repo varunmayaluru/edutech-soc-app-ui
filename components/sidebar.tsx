@@ -3,14 +3,14 @@ import { BookOpen, Users, MessageSquare, Settings, HelpCircle, LogOut, Home, Bar
 
 export default function Sidebar() {
   return (
-    <aside className="w-16 border-r border-gray-200 flex flex-col items-center py-6 bg-white shadow-sm">
+    <aside className="w-16 border-r border-gray-200 flex flex-col items-center py-6 bg-white shadow-md z-10">
       <div className="flex-1 flex flex-col items-center gap-6">
         <Link
           href="/"
           className="p-3 rounded-md text-gray-500 hover:bg-blue-50 hover:text-[#1e74bb] transition-colors relative group"
         >
           <Home className="h-6 w-6" />
-          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
             Dashboard
           </span>
         </Link>
@@ -20,7 +20,7 @@ export default function Sidebar() {
           className="p-3 rounded-md text-gray-500 hover:bg-blue-50 hover:text-[#1e74bb] transition-colors relative group"
         >
           <BookOpen className="h-6 w-6" />
-          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
             Subjects
           </span>
         </Link>
@@ -30,7 +30,7 @@ export default function Sidebar() {
           className="p-3 rounded-md text-gray-500 hover:bg-blue-50 hover:text-[#1e74bb] transition-colors relative group"
         >
           <MessageSquare className="h-6 w-6" />
-          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
             Chat
           </span>
         </Link>
@@ -40,7 +40,7 @@ export default function Sidebar() {
           className="p-3 rounded-md text-gray-500 hover:bg-blue-50 hover:text-[#1e74bb] transition-colors relative group"
         >
           <Users className="h-6 w-6" />
-          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
             Users
           </span>
         </Link>
@@ -50,7 +50,7 @@ export default function Sidebar() {
           className="p-3 rounded-md text-gray-500 hover:bg-blue-50 hover:text-[#1e74bb] transition-colors relative group"
         >
           <BarChart className="h-6 w-6" />
-          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
             Analytics
           </span>
         </Link>
@@ -60,7 +60,7 @@ export default function Sidebar() {
           className="p-3 rounded-md text-gray-500 hover:bg-blue-50 hover:text-[#1e74bb] transition-colors relative group"
         >
           <Settings className="h-6 w-6" />
-          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
             Settings
           </span>
         </Link>
@@ -72,7 +72,7 @@ export default function Sidebar() {
           className="p-3 rounded-md text-gray-500 hover:bg-blue-50 hover:text-[#1e74bb] transition-colors relative group"
         >
           <HelpCircle className="h-6 w-6" />
-          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
             Help
           </span>
         </Link>
@@ -83,7 +83,7 @@ export default function Sidebar() {
           title="Logout"
         >
           <LogOut className="h-6 w-6" />
-          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">
+          <span className="absolute left-full ml-2 px-2 py-1 bg-gray-800 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap z-50">
             Logout
           </span>
         </Link>
