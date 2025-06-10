@@ -1,15 +1,32 @@
 import Link from "next/link"
 import { subjects } from "@/lib/data"
+import Image from "next/image"
 
 export default function SubjectsList() {
+  // Subject icons mapping
+  const subjectIcons = {
+    arthematic: "/basic-calculator.png",
+    science: "/placeholder.svg?key=gzuub",
+    english: "/placeholder.svg?key=re3ri",
+    "social-studies": "/world-globe.png",
+    "computer-science": "/modern-computer-setup.png",
+    hindhi: "/placeholder.svg?key=4xycn",
+  }
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {subjects.map((subject) => (
-        <div key={subject.id} className="bg-white rounded-lg p-6 shadow-sm border border-gray-100">
+        <div key={subject.id} className="card p-6" style={{ borderRadius: "0.5rem" }}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-medium">{subject.name}</h3>
-            <div className={`w-10 h-10 rounded-md flex items-center justify-center`}>
-              <span className="text-xl">{subject.icon}</span>
+            <div className="w-10 h-10">
+              <Image
+                src={subjectIcons[subject.id as keyof typeof subjectIcons] || "/placeholder.svg"}
+                alt={subject.name}
+                width={40}
+                height={40}
+                className="object-contain"
+              />
             </div>
           </div>
 
